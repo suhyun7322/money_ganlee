@@ -3,348 +3,361 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>개인 재정 관리 대시보드</title>
+    <title>Personal Finance Dashboard - Professional Edition</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* 다크모드 기반 커스텀 스타일 및 스크롤바 정돈 */
+        :root {
+            --primary: #1e3a8a;    /* 딥 네이비 */
+            --accent: #2563eb;     /* 프로페셔널 블루 */
+            --bg-main: #f8fafc;    /* 연한 그레이-화이트 배경 */
+            --bg-card: #ffffff;    /* 순백색 카드 */
+            --border: #e2e8f0;     /* 차분한 테두리 색상 */
+            --text-main: #1e293b;
+            --text-sub: #64748b;
+        }
+
         body {
-            background-color: #0f172a;
-            color: #f8fafc;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            font-family: 'Lato', sans-serif;
+            margin: 0;
+            padding: 0;
         }
-        ::-webkit-scrollbar {
-            width: 6px;
+
+        h1, h2, h3 {
+            font-family: 'Poppins', sans-serif;
+            color: var(--primary);
         }
-        ::-webkit-scrollbar-thumb {
-            background: #334155;
-            border-radius: 3px;
+
+        /* 아이패드 가로 및 데스크톱을 위한 레이아웃 래퍼 */
+        .dashboard-wrapper {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 40px 24px;
         }
+
+        /* 솔리드 카드 디자인 (글래스모피즘 완전 제거) */
+        .pro-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            padding: 24px;
+        }
+
+        /* 인풋 및 셀렉트 박스 스타일 */
+        input[type="number"], input[type="text"], select {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 14px;
+            width: 100%;
+            outline: none;
+            background-color: #ffffff;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        /* 프로그레스 바 공통 트랙 */
+        .progress-track {
+            background-color: #f1f5f9;
+            border-radius: 999px;
+            height: 12px;
+            overflow: hidden;
+        }
+
+        /* 스크롤바 정돈 */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     </style>
 </head>
-<body class="p-6 min-h-screen flex flex-col justify-between">
+<body class="min-h-screen">
 
-    <div class="max-w-7xl mx-auto w-full space-y-6">
-        <header class="flex justify-between items-center bg-slate-800 p-5 rounded-2xl shadow-xl border border-slate-700">
+    <div class="dashboard-wrapper">
+        <header class="flex justify-between items-end mb-8 border-b border-slate-200 pb-6">
             <div>
-                <h1 class="text-2xl font-bold tracking-tight text-emerald-400">📊 Finance Dashboard</h1>
-                <p class="text-sm text-slate-400 mt-1">아이패드 최적화 개인 자산 관리 시스템</p>
+                <h1 class="text-3xl font-bold tracking-tight">Strategic Asset Dashboard</h1>
+                <p class="text-slate-500 mt-1.5 font-medium">관리자용 통합 재정 분석 시스템</p>
             </div>
             <div class="text-right">
-                <span class="text-xs bg-slate-700 text-slate-300 px-3 py-1.5 rounded-full border border-slate-600">🌙 Dark Mode Active</span>
+                <div class="flex items-center gap-2 text-emerald-600 font-bold text-sm">
+                    <i class="fa-solid fa-shield-halved"></i>
+                    <span>Secure Local Session</span>
+                </div>
             </div>
         </header>
 
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-12 gap-6">
             
-            <div class="space-y-6 lg:col-span-1">
-                <section class="bg-slate-800 p-5 rounded-2xl shadow-md border border-slate-700 space-y-4">
-                    <h2 class="text-lg font-semibold text-slate-200">💰 자산 설정</h2>
-                    <div>
-                        <label class="block text-xs text-slate-400 mb-1">현재 잔액 (원)</label>
-                        <input type="number" id="currentBalance" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-emerald-400 font-semibold focus:outline-none focus:border-emerald-500" value="0" onchange="updateCalculations()">
-                    </div>
-                    <div>
-                        <label class="block text-xs text-slate-400 mb-1">이번 달 기본 예산 (원)</label>
-                        <input type="number" id="monthlyBudget" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-blue-400 font-semibold focus:outline-none focus:border-blue-500" value="1000000" onchange="updateCalculations()">
-                    </div>
-                    <div>
-                        <label class="block text-xs text-slate-400 mb-1">MMF 보유 금액 (원)</label>
-                        <input type="number" id="mmfBalance" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-amber-400 font-semibold focus:outline-none focus:border-amber-500" value="0" onchange="updateCalculations()">
-                    </div>
-                    <div>
-                        <label class="block text-xs text-slate-400 mb-1">MMF 목표 금액 (원)</label>
-                        <input type="number" id="mmfTarget" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2.5 text-slate-300 focus:outline-none focus:border-amber-500" value="5000000" onchange="updateCalculations()">
-                    </div>
-                </section>
-
-                <section class="bg-slate-800 p-5 rounded-2xl shadow-md border border-slate-700 space-y-4">
-                    <h2 class="text-lg font-semibold text-slate-200">💸 요약 및 추적</h2>
-                    
-                    <div class="p-3.5 bg-slate-900/50 rounded-xl border border-slate-700/60">
-                        <p class="text-xs text-slate-400">남은 예상 금액 (잔액 - 예정지출)</p>
-                        <p class="text-xl font-bold text-emerald-400 mt-1" id="estimatedResult">0 원</p>
-                    </div>
-
-                    <div class="p-3.5 bg-slate-900/50 rounded-xl border border-slate-700/60">
-                        <p class="text-xs text-slate-400">이번 달 남은 예산 (예산 - 지출합계)</p>
-                        <p class="text-xl font-bold text-blue-400 mt-1" id="budgetLeftResult">0 원</p>
-                    </div>
-
-                    <div class="p-3.5 bg-slate-900/50 rounded-xl border border-slate-700/60">
-                        <div class="flex justify-between items-center">
-                            <p class="text-xs text-slate-400">☕ 간식/카페 지출 현황</p>
-                            <span class="text-xs text-rose-400 font-medium" id="cafeRatio">0%</span>
-                        </div>
-                        <p class="text-base font-semibold text-slate-200 mt-1" id="cafeTotal">0 원 / 100,000 원</p>
-                    </div>
-
-                    <div class="space-y-1.5 pt-2">
-                        <div class="flex justify-between text-xs">
-                            <span class="text-slate-400">🎯 MMF 달성률</span>
-                            <span class="text-amber-400 font-bold" id="mmfPercent">0%</span>
-                        </div>
-                        <div class="w-full bg-slate-900 rounded-full h-3.5 border border-slate-700 overflow-hidden">
-                            <div id="mmfProgressBar" class="bg-gradient-to-r from-amber-500 to-yellow-400 h-3.5 rounded-full transition-all duration-500" style="width: 0%"></div>
-                        </div>
-                    </div>
-                </section>
-            </div>
-
-            <div class="space-y-6 lg:col-span-2 flex flex-col justify-between">
+            <div class="col-span-12 lg:col-span-4 space-y-6">
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <section class="bg-slate-800 p-5 rounded-2xl shadow-md border border-slate-700 space-y-4 flex flex-col justify-between">
-                        <h2 class="text-lg font-semibold text-slate-200">📝 지출 기록 추가</h2>
-                        <form id="expenseForm" onsubmit="addExpense(event)" class="space-y-3">
-                            <div>
-                                <label class="block text-xs text-slate-400 mb-1">내역명</label>
-                                <input type="text" id="expTitle" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2 text-sm focus:outline-none focus:border-emerald-500">
-                            </div>
-                            <div class="grid grid-cols-2 gap-2">
-                                <div>
-                                    <label class="block text-xs text-slate-400 mb-1">금액</label>
-                                    <input type="number" id="expAmount" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2 text-sm focus:outline-none focus:border-emerald-500">
-                                </div>
-                                <div>
-                                    <label class="block text-xs text-slate-400 mb-1">카테고리</label>
-                                    <select id="expCategory" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-2 text-sm focus:outline-none focus:border-emerald-500 text-slate-300">
-                                        <option value="식비">🍔 식비</option>
-                                        <option value="카페/간식">☕ 카페/간식</option>
-                                        <option value="교통">🚌 교통</option>
-                                        <option value="쇼핑">🛍️ 쇼핑</option>
-                                        <option value="기타">✨ 기타</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="flex items-center pt-2">
-                                <input type="checkbox" id="expIsExpected" class="w-4 h-4 text-emerald-600 bg-slate-900 border-slate-700 rounded focus:ring-emerald-500">
-                                <label for="expIsExpected" class="ml-2 text-xs text-slate-300 select-none cursor-pointer">이 지출은 **예정된 지출**입니다.</label>
-                            </div>
-                            <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium p-2.5 rounded-xl transition mt-2 shadow-lg">기록 추가</button>
-                        </form>
-                    </section>
-
-                    <section class="bg-slate-800 p-5 rounded-2xl shadow-md border border-slate-700 flex flex-col justify-between">
-                        <h2 class="text-lg font-semibold text-slate-200 mb-2">📊 카테고리별 통계</h2>
-                        <div class="relative w-full h-44 flex items-center justify-center">
-                            <canvas id="categoryChart"></canvas>
+                <div class="pro-card">
+                    <h2 class="text-md font-bold mb-4 flex items-center gap-2 text-slate-700">
+                        <i class="fa-solid fa-wallet text-blue-600"></i> 자산 현황 설정
+                    </h2>
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-xs font-bold text-slate-500 block mb-1">현재 잔액 (원)</label>
+                            <input type="number" id="currentBalance" value="0" onchange="sync()">
                         </div>
-                    </section>
+                        <div>
+                            <label class="text-xs font-bold text-slate-500 block mb-1">월간 총 예산 (원)</label>
+                            <input type="number" id="monthlyBudget" value="1500000" onchange="sync()">
+                        </div>
+                        <div class="pt-4 border-t border-slate-100">
+                            <label class="text-xs font-bold text-slate-600 block mb-1 font-semibold">MMF 현재 잔액 (원)</label>
+                            <input type="number" id="mmfBalance" value="0" onchange="sync()">
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-slate-500 block mb-1">MMF 최종 목표 (원)</label>
+                            <input type="number" id="mmfTarget" value="10000000" onchange="sync()">
+                        </div>
+                    </div>
                 </div>
 
-                <section class="bg-slate-800 p-5 rounded-2xl shadow-md border border-slate-700 flex-1">
-                    <div class="flex justify-between items-center mb-3">
-                        <h2 class="text-lg font-semibold text-slate-200">📋 지출 내역 리스트</h2>
-                        <button onclick="clearAllExpenses()" class="text-xs text-rose-400 hover:underline">전체 삭제</button>
+                <div class="pro-card">
+                    <h2 class="text-sm font-bold text-slate-500 uppercase tracking-wider mb-3">MMF Goal Achievement</h2>
+                    <div class="flex justify-between items-end mb-2">
+                        <span id="mmfPercentText" class="text-3xl font-bold text-blue-600">0%</span>
+                        <span class="text-xs text-slate-400 font-bold">🎯 TARGET LEVEL</span>
                     </div>
-                    <div class="overflow-y-auto max-h-80 space-y-2 pr-1" id="expenseList">
-                        <p class="text-center text-sm text-slate-500 py-8">등록된 지출 내역이 없습니다.</p>
+                    <div class="progress-track">
+                        <div id="mmfBar" class="bg-blue-600 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
                     </div>
-                </section>
+                </div>
+
+                <div class="pro-card border-l-4 border-amber-500">
+                    <h2 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Cafe & Snack Limit</h2>
+                    <div class="flex items-baseline gap-1.5 mb-2">
+                        <span id="cafeSpent" class="text-xl font-bold text-slate-800">0</span>
+                        <span class="text-xs text-slate-400 font-bold">/ 150,000 원</span>
+                    </div>
+                    <div class="progress-track h-2">
+                        <div id="cafeBar" class="bg-amber-500 h-full rounded-full transition-all duration-300" style="width: 0%"></div>
+                    </div>
+                </div>
             </div>
 
+            <div class="col-span-12 lg:col-span-8 space-y-6">
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="pro-card bg-slate-100/70 border-slate-200">
+                        <p class="text-xs font-bold text-slate-500 uppercase">남은 예상 금액 (잔액 - 예정지출)</p>
+                        <p id="estimatedResult" class="text-2xl font-bold text-slate-900 mt-1">0 원</p>
+                    </div>
+                    <div class="pro-card bg-blue-600 border-none">
+                        <p class="text-xs font-bold text-blue-200 uppercase">이번 달 남은 가용 예산</p>
+                        <p id="budgetLeft" class="text-2xl font-bold text-white mt-1">0 원</p>
+                    </div>
+                </div>
+
+                <div class="pro-card">
+                    <h2 class="text-md font-bold mb-4 text-slate-700 flex items-center gap-2">
+                        <i class="fa-solid fa-pen-to-square text-blue-600"></i> New Transaction 기록
+                    </h2>
+                    <form id="expenseForm" onsubmit="addExpense(event)" class="space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div class="sm:col-span-1">
+                                <label class="text-xs font-bold text-slate-500 mb-1 block">지출 내역명</label>
+                                <input type="text" id="expTitle" placeholder="예: 스타벅스" required>
+                            </div>
+                            <div>
+                                <label class="text-xs font-bold text-slate-500 mb-1 block">금액 (원)</label>
+                                <input type="number" id="expAmount" required>
+                            </div>
+                            <div>
+                                <label class="text-xs font-bold text-slate-500 mb-1 block">카테고리</label>
+                                <select id="expCategory">
+                                    <option value="식비">🍔 식비</option>
+                                    <option value="카페/간식">☕ 카페/간식</option>
+                                    <option value="교통">🚌 교통</option>
+                                    <option value="쇼핑">🛍️ 쇼핑</option>
+                                    <option value="기타">✨ 기타</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 py-1">
+                            <input type="checkbox" id="expIsExpected" class="w-4 h-4 accent-blue-600 cursor-pointer">
+                            <label for="expIsExpected" class="text-xs font-bold text-slate-600 cursor-pointer select-none">
+                                이 지출은 <strong>예정된 지출</strong>입니다. (체크 시 현재 잔액에서 우선 차감 계산)
+                            </label>
+                        </div>
+                        <button type="submit" class="w-full bg-blue-600 text-white font-bold py-2.5 rounded-lg hover:bg-blue-700 transition shadow-md">
+                            거래 데이터 등록
+                        </button>
+                    </form>
+                </div>
+
+                <div class="pro-card">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-md font-bold text-slate-700">Transaction Ledger</h2>
+                        <button onclick="clearAll()" class="text-xs font-bold text-rose-500 border border-rose-100 px-2.5 py-1 rounded hover:bg-rose-50 transition">
+                            전체 초기화
+                        </button>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50 text-slate-400 text-[11px] uppercase font-bold border-b border-slate-100">
+                                    <th class="px-4 py-2.5">분류</th>
+                                    <th class="px-4 py-2.5">내역명</th>
+                                    <th class="px-4 py-2.5 text-right">금액</th>
+                                    <th class="px-4 py-2.5 text-center">삭제</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ledgerBody" class="text-sm divide-y divide-slate-100">
+                                </tbody>
+                        </table>
+                        <div id="emptyState" class="py-12 text-center text-slate-300 font-bold hidden">
+                            <i class="fa-solid fa-box-open text-3xl mb-2 block"></i>
+                            등록된 거래 내역이 없습니다.
+                        </div>
+                    </div>
+                </div>
+
+            </div>
         </div>
     </div>
 
-    <footer class="text-center text-xs text-slate-600 mt-10">
-        &copy; 2026 Private Finance Workspace. LocalStorage 기반 시스템.
-    </footer>
-
     <script>
-        // 대시보드 상태 관리 객체
+        // 기본 데이터 상태 정의
         let state = {
             currentBalance: 0,
-            monthlyBudget: 1000000,
+            monthlyBudget: 1500000,
             mmfBalance: 0,
-            mmfTarget: 5000000,
+            mmfTarget: 10000000,
             expenses: []
         };
 
-        let chartInstance = null;
-
-        // 초기화 데이터 로드
-        window.onload = function() {
-            loadFromLocalStorage();
-            initChart();
-            updateCalculations();
-        };
-
-        // 데이터 저장 및 불러오기
-        function saveToLocalStorage() {
-            localStorage.setItem('finance_state', JSON.stringify(state));
-        }
-
-        function loadFromLocalStorage() {
-            const data = localStorage.getItem('finance_state');
-            if (data) {
-                state = JSON.parse(data);
-                // 인풋 값 매핑
+        // 앱 시작 시 실행
+        window.onload = () => {
+            const savedData = localStorage.getItem('pro_finance_data');
+            if (savedData) {
+                state = JSON.parse(savedData);
+                // 입력 컴포넌트들에 값 세팅
                 document.getElementById('currentBalance').value = state.currentBalance;
                 document.getElementById('monthlyBudget').value = state.monthlyBudget;
                 document.getElementById('mmfBalance').value = state.mmfBalance;
                 document.getElementById('mmfTarget').value = state.mmfTarget;
             }
+            sync();
+        };
+
+        // 연산 처리 및 실시간 화면 갱신 함수
+        function sync() {
+            // 현재 입력창 값 읽어오기
+            state.currentBalance = Number(document.getElementById('currentBalance').value) || 0;
+            state.monthlyBudget = Number(document.getElementById('monthlyBudget').value) || 0;
+            state.mmfBalance = Number(document.getElementById('mmfBalance').value) || 0;
+            state.mmfTarget = Number(document.getElementById('mmfTarget').value) || 1; // 분모 0 방지
+
+            // 로컬 스토리지 데이터 백업
+            localStorage.setItem('pro_finance_data', JSON.stringify(state));
+
+            let totalSpent = 0;       // 총 지출액
+            let expectedSpent = 0;    // 체크박스 활성화된 예정 지출액
+            let cafeTotal = 0;        // 카페/간식 누적액
+
+            state.expenses.forEach(e => {
+                totalSpent += e.amount;
+                if (e.isExpected) {
+                    expectedSpent += e.amount;
+                }
+                if (e.category === '카페/간식') {
+                    cafeTotal += e.amount;
+                }
+            });
+
+            // 결과 보드 데이터 주입
+            document.getElementById('estimatedResult').innerText = (state.currentBalance - expectedSpent).toLocaleString() + " 원";
+            document.getElementById('budgetLeft').innerText = (state.monthlyBudget - totalSpent).toLocaleString() + " 원";
+            
+            // MMF 게이지 바 갱신
+            const mmfRatio = Math.min((state.mmfBalance / state.mmfTarget) * 100, 100);
+            document.getElementById('mmfBar').style.width = mmfRatio + "%";
+            document.getElementById('mmfPercentText').innerText = mmfRatio.toFixed(1) + "%";
+
+            // 카페/간식 전용 자동 한도 추적 (기준치: 150,000원 고정 프로토타입)
+            const cafeLimit = 150000;
+            document.getElementById('cafeSpent').innerText = cafeTotal.toLocaleString();
+            document.getElementById('cafeBar').style.width = Math.min((cafeTotal / cafeLimit) * 100, 100) + "%";
+
+            // 테이블 렌더링 호출
+            renderLedger();
         }
 
-        // 지출 내역 리스트 추가
+        // 지출 아이템 추가 처리
         function addExpense(e) {
             e.preventDefault();
-            const title = document.getElementById('expTitle').value;
-            const amount = parseInt(document.getElementById('expAmount').value) || 0;
-            const category = document.getElementById('expCategory').value;
-            const isExpected = document.getElementById('expIsExpected').checked;
-
-            const newExpense = {
+            
+            const newExp = {
                 id: Date.now(),
-                title,
-                amount,
-                category,
-                isExpected
+                title: document.getElementById('expTitle').value.trim(),
+                amount: Number(document.getElementById('expAmount').value) || 0,
+                category: document.getElementById('expCategory').value,
+                isExpected: document.getElementById('expIsExpected').checked
             };
 
-            state.expenses.push(newExpense);
-            saveToLocalStorage();
-            updateCalculations();
-
-            // 폼 초기화
-            document.getElementById('expenseForm').reset();
+            state.expenses.push(newExp);
+            document.getElementById('expenseForm').reset(); // 인풋 리셋
+            sync();
         }
 
-        // 특정 지출 내역 제거
-        function deleteExpense(id) {
-            state.expenses = state.expenses.filter(item => item.id !== id);
-            saveToLocalStorage();
-            updateCalculations();
+        // 특정 항목 제거
+        function deleteExp(id) {
+            state.expenses = state.expenses.filter(e => e.id !== id);
+            sync();
         }
 
-        // 전체 초기화
-        function clearAllExpenses() {
-            if(confirm("모든 지출 내역을 삭제하시겠습니까?")) {
+        // 데이터 토탈 삭제
+        function clearAll() {
+            if (confirm("기록된 모든 지출 내역 데이터를 지우시겠습니까?")) {
                 state.expenses = [];
-                saveToLocalStorage();
-                updateCalculations();
+                sync();
             }
         }
 
-        // 종합 연산 및 UI 갱신 함수
-        function updateCalculations() {
-            // 인풋 값 실시간 동기화
-            state.currentBalance = parseInt(document.getElementById('currentBalance').value) || 0;
-            state.monthlyBudget = parseInt(document.getElementById('monthlyBudget').value) || 0;
-            state.mmfBalance = parseInt(document.getElementById('mmfBalance').value) || 0;
-            state.mmfTarget = parseInt(document.getElementById('mmfTarget').value) || 1; // 0 분모 방지
-            saveToLocalStorage();
-
-            // 1. 예정 지출 총액 및 전체 지출 총액 계산
-            let totalExpected = 0;
-            let totalSpent = 0;
-            let cafeSpent = 0;
-
-            state.expenses.forEach(item => {
-                totalSpent += item.amount;
-                if (item.isExpected) {
-                    totalExpected += item.amount;
-                }
-                if (item.category === '카페/간식') {
-                    cafeSpent += item.amount;
-                }
-            });
-
-            // 2. 결과 값 산출
-            const estimatedResult = state.currentBalance - totalExpected; // 남은 예상 금액
-            const budgetLeftResult = state.monthlyBudget - totalSpent;     // 이번 달 남은 사용 가능 금액
-
-            // 3. UI 렌더링
-            document.getElementById('estimatedResult').innerText = estimatedResult.toLocaleString() + " 원";
-            document.getElementById('budgetLeftResult').innerText = budgetLeftResult.toLocaleString() + " 원";
+        // 거래 명세표 데이터 바인딩
+        function renderLedger() {
+            const body = document.getElementById('ledgerBody');
+            const empty = document.getElementById('emptyState');
             
-            // 카페/간식 트래킹 (한도 10만원 고정 가이드라인 예시)
-            const cafeLimit = 100000;
-            const cafeRatio = Math.min((cafeSpent / cafeLimit) * 100, 100).toFixed(0);
-            document.getElementById('cafeTotal').innerText = `${cafeSpent.toLocaleString()} 원 / ${cafeLimit.toLocaleString()} 원`;
-            document.getElementById('cafeRatio').innerText = `${cafeRatio}%`;
-
-            // MMF 달성률 계산
-            const mmfRatio = Math.min((state.mmfBalance / state.mmfTarget) * 100, 100).toFixed(1);
-            document.getElementById('mmfPercent').innerText = `${mmfRatio}%`;
-            document.getElementById('mmfProgressBar').style.width = `${mmfRatio}%`;
-
-            // 리스트 다시 그리기
-            renderExpenseList();
-            
-            // 차트 동기화 update
-            updateChart(getCategoryTotals());
-        }
-
-        // 내역 리스트 UI 출력
-        function renderExpenseList() {
-            const listContainer = document.getElementById('expenseList');
-            if(state.expenses.length === 0) {
-                listContainer.innerHTML = `<p class="text-center text-sm text-slate-500 py-8">등록된 지출 내역이 없습니다.</p>`;
+            if (state.expenses.length === 0) {
+                body.innerHTML = "";
+                empty.classList.remove('hidden');
                 return;
             }
+            empty.classList.add('hidden');
 
-            listContainer.innerHTML = state.expenses.map(item => `
-                <div class="flex justify-between items-center bg-slate-900 p-3 rounded-xl border border-slate-700/50 transition hover:border-slate-600">
-                    <div class="flex items-center space-x-2.5">
-                        <span class="text-xs px-2 py-1 rounded-md bg-slate-800 text-slate-300 border border-slate-700">${item.category}</span>
-                        <div>
-                            <p class="text-sm font-medium ${item.isExpected ? 'text-amber-300 font-semibold' : 'text-slate-200'}">
-                                ${item.title} ${item.isExpected ? '<span class="text-[10px] bg-amber-500/20 text-amber-400 px-1 rounded">예정</span>' : ''}
-                            </p>
-                        </div>
-                    </div>
-                    <div class="flex items-center space-x-3">
-                        <span class="text-sm font-bold text-slate-100">${item.amount.toLocaleString()}원</span>
-                        <button onclick="deleteExpense(${item.id})" class="text-slate-500 hover:text-rose-400 text-xs p-1">✕</button>
-                    </div>
-                </div>
+            // 최근 등록 순서로 역순 정렬 출력
+            body.innerHTML = state.expenses.slice().reverse().map(e => `
+                <tr class="hover:bg-slate-50/80 transition">
+                    <td class="px-4 py-3">
+                        <span class="px-2 py-0.5 bg-slate-100 text-slate-600 text-[11px] font-bold rounded">${e.category}</span>
+                    </td>
+                    <td class="px-4 py-3 font-semibold text-slate-700">
+                        ${e.title}
+                        ${e.isExpected ? '<span class="ml-1.5 text-[10px] text-blue-600 border border-blue-200 px-1 rounded font-bold bg-blue-50/50">예정</span>' : ''}
+                    </td>
+                    <td class="px-4 py-3 text-right font-bold text-slate-900">
+                        ${e.amount.toLocaleString()} 원
+                    </td>
+                    <td class="px-4 py-3 text-center">
+                        <button onclick="deleteExp(${e.id})" class="text-slate-300 hover:text-rose-500 transition p-1">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </td>
+                </tr>
             `).join('');
-        }
-
-        // 카테고리별 합산 추출
-        function getCategoryTotals() {
-            const totals = { '식비': 0, '카페/간식': 0, '교통': 0, '쇼핑': 0, '기타': 0 };
-            state.expenses.forEach(item => {
-                if(totals[item.category] !== undefined) {
-                    totals[item.category] += item.amount;
-                }
-            });
-            return Object.values(totals);
-        }
-
-        // Chart.js 초기화 및 연동
-        function initChart() {
-            const ctx = document.getElementById('categoryChart').getContext('2document.getElementById');
-            chartInstance = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['식비', '카페/간식', '교통', '쇼핑', '기타'],
-                    datasets: [{
-                        data: [0, 0, 0, 0, 0],
-                        backgroundColor: ['#f87171', '#fbbf24', '#34d399', '#60a5fa', '#a78bfa'],
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'right',
-                            labels: { color: '#94a3b8', font: { size: 11 } }
-                        }
-                    }
-                }
-            });
-        }
-
-        function updateChart(dataArray) {
-            if(chartInstance) {
-                chartInstance.data.datasets[0].data = dataArray;
-                chartInstance.update();
-            }
         }
     </script>
 </body>
